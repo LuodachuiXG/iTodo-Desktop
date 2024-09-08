@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * 首页 Screen
@@ -16,7 +17,7 @@ import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 @Composable
 fun HomeScreen(
     navController: NavHostController,
-    vm: HomeViewModel = viewModel { HomeViewModel() }
+    vm: HomeViewModel = koinViewModel()
 ) {
     Column(
         modifier = Modifier.padding(DEFAULT_PADDING)

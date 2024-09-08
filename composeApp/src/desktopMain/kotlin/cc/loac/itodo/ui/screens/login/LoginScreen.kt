@@ -9,14 +9,18 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
+import org.koin.compose.viewmodel.koinNavViewModel
+import org.koin.compose.viewmodel.koinViewModel
+import org.koin.core.annotation.KoinExperimentalAPI
 
 /**
  * 登录 Screen
  */
+@OptIn(KoinExperimentalAPI::class)
 @Composable
 fun LoginScreen(
     navController: NavHostController,
-    vm: LoginViewModel = viewModel { LoginViewModel() }
+    vm: LoginViewModel = koinNavViewModel()
 ) {
     Column(
         modifier = Modifier.padding(DEFAULT_PADDING)

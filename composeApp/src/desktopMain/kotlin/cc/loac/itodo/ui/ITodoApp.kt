@@ -4,7 +4,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -13,7 +12,6 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -37,9 +35,9 @@ private sealed class RouteBar(
     val name: String,
     val icon: ImageVector
 ) {
-    data object Me : RouteBar(Screens.ME, "我", Icons.Default.Person)
-    data object Home : RouteBar(Screens.HOME, "首页", Icons.Default.Home)
-    data object Login : RouteBar(Screens.LOGIN, "登录", Icons.Default.Lock)
+    data object Me : RouteBar(Screens.ME, Screens.ME.screenName, Icons.Default.Person)
+    data object Home : RouteBar(Screens.HOME, Screens.HOME.screenName, Icons.Default.Home)
+    data object Login : RouteBar(Screens.LOGIN, Screens.LOGIN.screenName, Icons.Default.Lock)
 }
 
 
@@ -49,8 +47,14 @@ private val bars = listOf(
     RouteBar.Login
 )
 
+/**
+ * iTodo 程序入口
+ * @param onScreenChange 屏幕切换事件（回调当前页面名）
+ */
 @Composable
-fun ITodoApp() {
+fun ITodoApp(
+    onScreenChange: (name: String) -> Unit = {}
+) {
     val navController = rememberNavController()
     val snackBarHostState = remember {
         SnackbarHostState()
@@ -75,6 +79,7 @@ fun ITodoApp() {
                             alwaysShowLabel = false,
                             selected = currentRoute == it.route.route,
                             onClick = {
+                                onScreenChange(it.route.screenName)
                                 navController.navigate(it.route.route) {
                                     // 清空栈内到 popUpTo ID 之间的所有 Item
                                     popUpTo(navController.graph.findStartDestination().id) {

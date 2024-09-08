@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * 我 Screen
@@ -16,7 +17,7 @@ import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 @Composable
 fun MeScreen(
     navController: NavHostController,
-    vm: MeViewModel = viewModel { MeViewModel() }
+    vm: MeViewModel = koinViewModel()
 ) {
     Column(
         modifier = Modifier.padding(DEFAULT_PADDING)

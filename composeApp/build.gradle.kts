@@ -21,8 +21,25 @@ kotlin {
             implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
+
+            // Compose Navigation
             implementation(libs.compose.navigation)
-            implementation(libs.compose.icons)
+
+            // SLF4J
+            implementation(libs.slf4j)
+
+            // Exposed
+            implementation(libs.exposed.core)
+            implementation(libs.exposed.dao)
+            implementation(libs.exposed.jdbc)
+
+            // H2
+            implementation(libs.sql.h2)
+
+            // Koin 注入
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel.navigation)
+
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
