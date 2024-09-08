@@ -22,6 +22,15 @@ fun String.matches(regex: String, find: Boolean = false): Boolean {
 
 /**
  * String 扩展函数
+ * 判断文本是否是合法的 URL
+ */
+fun String.isUrl(): Boolean {
+    // 判断标准为 http:// 或 https:// 开头，并且最少存在一个 .
+    return this.matches("^(http|https)://[^.]+\\.[^/]*\$")
+}
+
+/**
+ * String 扩展函数
  * 验证是否是整数
  */
 fun String.isInt(): Boolean {

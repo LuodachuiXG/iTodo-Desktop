@@ -40,11 +40,10 @@ private sealed class RouteBar(
     data object Login : RouteBar(Screens.LOGIN, Screens.LOGIN.screenName, Icons.Default.Lock)
 }
 
-
+// 底部显示的 Bar
 private val bars = listOf(
-    RouteBar.Me,
     RouteBar.Home,
-    RouteBar.Login
+    RouteBar.Me
 )
 
 /**
@@ -122,12 +121,12 @@ fun ITodoApp(
         ) {
             // 登录页面
             composable(Screens.LOGIN.route) {
-                LoginScreen(navController)
+                LoginScreen(navController, snackBarHostState)
             }
 
             // 首页
             composable(Screens.HOME.route) {
-                HomeScreen(navController)
+                HomeScreen(navController, snackBarHostState)
             }
 
             // 我

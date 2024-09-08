@@ -1,6 +1,7 @@
 package cc.loac.itodo.data.sql
 
 import cc.loac.itodo.data.sql.tables.KeyValues
+import cc.loac.itodo.data.sql.tables.Todos
 import kotlinx.coroutines.Dispatchers
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
@@ -44,7 +45,7 @@ object DatabaseSingleton {
             // 开启事物，要么全部成功，要么回滚
             transaction(database) {
                 // 所有表
-                val tables = listOf(KeyValues)
+                val tables = listOf(KeyValues, Todos)
                 // 创建表
                 SchemaUtils.create(*tables.toTypedArray())
             }

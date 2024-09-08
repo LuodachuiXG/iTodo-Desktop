@@ -1,0 +1,9 @@
+2024-09-08 22:34:19.187978+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TODO" not found; SQL statement:
+INSERT INTO TODO (TITLE, TODO, STATUS, CREATE_TIME, DEADLINE, FINISH_TIME, "top", UPLOADED) VALUES (?, ?, ?, ?, ?, ?, ?, ?) [42102-232]
+2024-09-08 22:34:19.197776+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TODO" not found; SQL statement:
+INSERT INTO TODO (TITLE, TODO, STATUS, CREATE_TIME, DEADLINE, FINISH_TIME, "top", UPLOADED) VALUES (?, ?, ?, ?, ?, ?, ?, ?) [42102-232]
+2024-09-08 22:34:19.210792+08:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TODO" not found; SQL statement:
+INSERT INTO TODO (TITLE, TODO, STATUS, CREATE_TIME, DEADLINE, FINISH_TIME, "top", UPLOADED) VALUES (?, ?, ?, ?, ?, ?, ?, ?) [42102-232]
