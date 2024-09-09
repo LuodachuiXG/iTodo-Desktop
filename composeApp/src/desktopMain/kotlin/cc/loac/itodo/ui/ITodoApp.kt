@@ -1,9 +1,6 @@
 package cc.loac.itodo.ui
 
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
+import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -11,9 +8,15 @@ import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.window.LocalWindowExceptionHandlerFactory
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -22,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import cc.loac.itodo.ui.screens.home.HomeScreen
 import cc.loac.itodo.ui.screens.login.LoginScreen
 import cc.loac.itodo.ui.screens.me.MeScreen
+import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 import cc.loac.itodo.ui.theme.MIDDLE
 
 /**
@@ -50,6 +54,7 @@ private val bars = listOf(
  * iTodo 程序入口
  * @param onScreenChange 屏幕切换事件（回调当前页面名）
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ITodoApp(
     onScreenChange: (name: String) -> Unit = {}
@@ -58,6 +63,16 @@ fun ITodoApp(
     val snackBarHostState = remember {
         SnackbarHostState()
     }
+
+    // 当前屏幕宽度
+    var currentWidth by remember {
+        mutableIntStateOf(0)
+    }
+    val currentWidthDp = with(LocalDensity.current) {
+        currentWidth.toDp()
+    }
+    // 当前是否是宽屏
+    val isWideScreen = currentWidthDp >= 768.dp
 
     // 获取导航当前路由
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -69,7 +84,9 @@ fun ITodoApp(
         },
         bottomBar = {
             // 只有在底部导航栏的页面才显示底部导航栏
-            if (currentRoute in bars.map { it.route.route }) {
+            AnimatedVisibility(
+                visible = currentRoute in bars.map { it.route.route } && !isWideScreen
+            ) {
                 NavigationBar(
                     modifier = Modifier.height(70.dp)
                 ) {
@@ -108,30 +125,76 @@ fun ITodoApp(
             }
         }
     ) {
-        NavHost(
-            navController = navController,
-            startDestination = Screens.LOGIN.route,
-            modifier = Modifier.padding(it).fillMaxSize(),
-            enterTransition = {
-                fadeIn() + scaleIn()
-            },
-            exitTransition = {
-                fadeOut() + scaleOut()
+        Row(
+            modifier = Modifier.onGloballyPositioned {
+                currentWidth = it.size.width
             }
         ) {
-            // 登录页面
-            composable(Screens.LOGIN.route) {
-                LoginScreen(navController, snackBarHostState)
+            AnimatedVisibility(
+                visible = currentRoute in bars.map { it.route.route } && isWideScreen
+            ) {
+                NavigationRail(
+                    modifier = Modifier.width(80.dp).padding(top = DEFAULT_PADDING),
+                    containerColor = MaterialTheme.colorScheme.background
+                ) {
+                    bars.forEach {
+                        NavigationRailItem(
+                            alwaysShowLabel = true,
+                            selected = currentRoute == it.route.route,
+                            onClick = {
+                                onScreenChange(it.route.screenName)
+                                navController.navigate(it.route.route) {
+                                    // 清空栈内到 popUpTo ID 之间的所有 Item
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        // 保存页面状态
+                                        saveState = true
+                                        inclusive = true
+                                    }
+                                    // 避免多次点击产生多个实例
+                                    launchSingleTop = true
+                                    // 再次点击之前的 Item 时恢复状态
+                                    restoreState = true
+                                }
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = it.icon,
+                                    contentDescription = it.name,
+                                    modifier = Modifier.size(MIDDLE)
+                                )
+                            },
+                            label = {
+                                Text(it.name)
+                            }
+                        )
+                    }
+                }
             }
+            NavHost(
+                navController = navController,
+                startDestination = Screens.LOGIN.route,
+                modifier = Modifier.padding(it).fillMaxSize(),
+                enterTransition = {
+                    fadeIn() + slideInHorizontally()
+                },
+                exitTransition = {
+                    fadeOut() + slideOutHorizontally(targetOffsetX = { it / 2 })
+                }
+            ) {
+                // 登录页面
+                composable(Screens.LOGIN.route) {
+                    LoginScreen(navController, snackBarHostState)
+                }
 
-            // 首页
-            composable(Screens.HOME.route) {
-                HomeScreen(navController, snackBarHostState)
-            }
+                // 首页
+                composable(Screens.HOME.route) {
+                    HomeScreen(navController, snackBarHostState, isWideScreen)
+                }
 
-            // 我
-            composable(Screens.ME.route) {
-                MeScreen(navController)
+                // 我
+                composable(Screens.ME.route) {
+                    MeScreen(navController)
+                }
             }
         }
     }
