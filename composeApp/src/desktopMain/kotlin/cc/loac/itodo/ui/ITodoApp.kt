@@ -13,10 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
-import androidx.compose.ui.window.LocalWindowExceptionHandlerFactory
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -27,6 +24,7 @@ import cc.loac.itodo.ui.screens.login.LoginScreen
 import cc.loac.itodo.ui.screens.me.MeScreen
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 import cc.loac.itodo.ui.theme.MIDDLE
+import cc.loac.itodo.ui.theme.SCREEN_WIDE
 
 /**
  * 路由 Bar 密封类
@@ -41,7 +39,6 @@ private sealed class RouteBar(
 ) {
     data object Me : RouteBar(Screens.ME, Screens.ME.screenName, Icons.Default.Person)
     data object Home : RouteBar(Screens.HOME, Screens.HOME.screenName, Icons.Default.Home)
-    data object Login : RouteBar(Screens.LOGIN, Screens.LOGIN.screenName, Icons.Default.Lock)
 }
 
 // 底部显示的 Bar
@@ -54,7 +51,6 @@ private val bars = listOf(
  * iTodo 程序入口
  * @param onScreenChange 屏幕切换事件（回调当前页面名）
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ITodoApp(
     onScreenChange: (name: String) -> Unit = {}
@@ -72,7 +68,7 @@ fun ITodoApp(
         currentWidth.toDp()
     }
     // 当前是否是宽屏
-    val isWideScreen = currentWidthDp >= 768.dp
+    val isWideScreen = currentWidthDp >= SCREEN_WIDE
 
     // 获取导航当前路由
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -188,7 +184,7 @@ fun ITodoApp(
 
                 // 首页
                 composable(Screens.HOME.route) {
-                    HomeScreen(navController, snackBarHostState, isWideScreen)
+                    HomeScreen(navController, snackBarHostState, currentWidthDp)
                 }
 
                 // 我

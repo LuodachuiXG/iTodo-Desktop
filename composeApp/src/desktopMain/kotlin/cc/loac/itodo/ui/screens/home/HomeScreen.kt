@@ -17,24 +17,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cc.loac.itodo.data.models.Todo
-import cc.loac.itodo.ui.theme.DEFAULT_PADDING
-import cc.loac.itodo.ui.theme.SMALL
-import cc.loac.itodo.ui.theme.VERY_SMALL
+import cc.loac.itodo.ui.theme.*
 import cc.loac.itodo.util.format
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * 首页 Screen
+ * @param navController 导航控制器
+ * @param snackBar SnackBar控制器
+ * @param windowWidth 屏幕宽度
+ * @param vm ViewModel
  */
 @Composable
 fun HomeScreen(
     navController: NavHostController,
     snackBar: SnackbarHostState,
-    isWideScreen: Boolean = false,
+    windowWidth: Dp,
     vm: HomeViewModel = koinViewModel()
 ) {
     val scope = rememberCoroutineScope()
@@ -81,56 +84,34 @@ fun HomeScreen(
             }
         }
 
-        val lazyColumState = rememberLazyListState()
         val lazyGridSate = rememberLazyGridState()
         Box {
-            if (isWideScreen) {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier.padding(top = SMALL),
-                    verticalArrangement = Arrangement.spacedBy(SMALL),
-                    state = lazyGridSate,
-                    horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING, Alignment.Start)
-                ) {
-                    items(todoList.value.size) {
-                        val todo = todoList.value[it]
-                        Card {
-                            Column(modifier = Modifier.padding(DEFAULT_PADDING)) {
-                                Text(
-                                    text = todo.todo,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-
-                                Text(
-                                    text = todo.createTime.format(),
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
-                        }
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(
+                    when {
+                        windowWidth <= SCREEN_WIDE -> 1
+                        windowWidth <= SCREEN_EXTRA_WIDE -> 2
+                        else -> 3
                     }
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier.padding(top = SMALL),
-                    verticalArrangement = Arrangement.spacedBy(SMALL),
-                    state = lazyColumState
-                ) {
-                    items(todoList.value.size) {
-                        val todo = todoList.value[it]
-                        Card(
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Column(modifier = Modifier.padding(DEFAULT_PADDING)) {
-                                Text(
-                                    text = todo.todo,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
+                ),
+                modifier = Modifier.padding(top = SMALL),
+                verticalArrangement = Arrangement.spacedBy(SMALL),
+                state = lazyGridSate,
+                horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING, Alignment.Start)
+            ) {
+                items(todoList.value.size) {
+                    val todo = todoList.value[it]
+                    Card {
+                        Column(modifier = Modifier.padding(DEFAULT_PADDING)) {
+                            Text(
+                                text = todo.todo,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
 
-                                Text(
-                                    text = todo.createTime.format(),
-                                    style = MaterialTheme.typography.bodySmall
-                                )
-                            }
+                            Text(
+                                text = todo.createTime.format(),
+                                style = MaterialTheme.typography.bodySmall
+                            )
                         }
                     }
                 }
@@ -141,11 +122,7 @@ fun HomeScreen(
                     .width(VERY_SMALL)
                     .align(Alignment.CenterEnd)
                     .offset(x = SMALL - 1.dp),
-                adapter = if (isWideScreen) {
-                    rememberScrollbarAdapter(lazyGridSate)
-                } else {
-                    rememberScrollbarAdapter(lazyColumState)
-                },
+                adapter = rememberScrollbarAdapter(lazyGridSate),
                 style = LocalScrollbarStyle.current.copy(
                     unhoverColor = MaterialTheme.colorScheme.surfaceVariant,
                     hoverColor = MaterialTheme.colorScheme.primary
