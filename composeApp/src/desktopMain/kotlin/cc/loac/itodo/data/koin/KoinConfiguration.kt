@@ -7,6 +7,7 @@ import cc.loac.itodo.data.sql.dao.impl.TodoDaoImpl
 import cc.loac.itodo.ui.screens.home.HomeViewModel
 import cc.loac.itodo.ui.screens.login.LoginViewModel
 import cc.loac.itodo.ui.screens.me.MeViewModel
+import cc.loac.itodo.ui.screens.theme.ThemeViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
@@ -30,5 +31,8 @@ fun koinConfiguration() = koinApplication {
 
         // 登录 ViewModel
         viewModelOf(::LoginViewModel)
+
+        // 主题 ViewModel
+        viewModelOf(::ThemeViewModel)
     })
 }

@@ -13,7 +13,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.navigation.NavHostController
-import cc.loac.itodo.data.models.Todo
 import cc.loac.itodo.data.sql.dao.TodoDao
 import cc.loac.itodo.ui.Screens
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
@@ -38,8 +37,6 @@ fun LoginScreen(
     vm: LoginViewModel = koinNavViewModel()
 ) {
     val scope = rememberCoroutineScope()
-
-    val todoDao = koinInject<TodoDao>()
 
     // iTodo 站点地址
     var url by remember {
@@ -92,8 +89,8 @@ private fun Title() {
         mutableStateOf(false)
     }
     LaunchedEffect(Unit) {
-        // 延迟 180 毫秒后显示 iTodo
-        delay(180)
+        // 延迟 50 毫秒后显示 iTodo
+        delay(50)
         showITodo = true
     }
 

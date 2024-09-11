@@ -4,11 +4,9 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -19,12 +17,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import cc.loac.itodo.data.models.enums.ScreenWidth
 import cc.loac.itodo.ui.screens.home.HomeScreen
 import cc.loac.itodo.ui.screens.login.LoginScreen
 import cc.loac.itodo.ui.screens.me.MeScreen
+import cc.loac.itodo.ui.screens.theme.ThemeScreen
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 import cc.loac.itodo.ui.theme.MIDDLE
-import cc.loac.itodo.ui.theme.SCREEN_WIDE
 
 /**
  * 路由 Bar 密封类
@@ -60,15 +59,17 @@ fun ITodoApp(
         SnackbarHostState()
     }
 
-    // 当前屏幕宽度
+    // 当前屏幕宽度 Px
     var currentWidth by remember {
         mutableIntStateOf(0)
     }
+    // 当前屏幕宽度 Dp
     val currentWidthDp = with(LocalDensity.current) {
         currentWidth.toDp()
     }
-    // 当前是否是宽屏
-    val isWideScreen = currentWidthDp >= SCREEN_WIDE
+
+    // 当前屏幕宽度枚举
+    val screenWidth = ScreenWidth.of(currentWidthDp)
 
     // 获取导航当前路由
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -81,7 +82,7 @@ fun ITodoApp(
         bottomBar = {
             // 只有在底部导航栏的页面才显示底部导航栏
             AnimatedVisibility(
-                visible = currentRoute in bars.map { it.route.route } && !isWideScreen
+                visible = currentRoute in bars.map { it.route.route } && screenWidth == ScreenWidth.NORMAL
             ) {
                 NavigationBar(
                     modifier = Modifier.height(70.dp)
@@ -127,7 +128,7 @@ fun ITodoApp(
             }
         ) {
             AnimatedVisibility(
-                visible = currentRoute in bars.map { it.route.route } && isWideScreen
+                visible = currentRoute in bars.map { it.route.route } && screenWidth != ScreenWidth.NORMAL
             ) {
                 NavigationRail(
                     modifier = Modifier.width(80.dp).padding(top = DEFAULT_PADDING),
@@ -184,12 +185,17 @@ fun ITodoApp(
 
                 // 首页
                 composable(Screens.HOME.route) {
-                    HomeScreen(navController, snackBarHostState, currentWidthDp)
+                    HomeScreen(navController, snackBarHostState, screenWidth)
                 }
 
                 // 我
                 composable(Screens.ME.route) {
-                    MeScreen(navController)
+                    MeScreen(navController, snackBarHostState, screenWidth)
+                }
+
+                // 主题
+                composable(Screens.THEME.route) {
+                    ThemeScreen(navController, snackBarHostState)
                 }
             }
         }

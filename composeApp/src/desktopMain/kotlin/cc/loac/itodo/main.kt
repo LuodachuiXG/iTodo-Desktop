@@ -124,7 +124,7 @@ fun main() {
                                         .padding(VERY_SMALL)
                                         .border(
                                             width = 1.dp,
-                                            color = if (dark) darkScheme.outline else lightScheme.outline,
+                                            color = MaterialTheme.colorScheme.outline,
                                             shape = RoundedCornerShape(SMALL)
                                         )
                                         .shadow(
@@ -138,7 +138,7 @@ fun main() {
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .background(
-                                                if (dark) darkScheme.background else lightScheme.background
+                                                MaterialTheme.colorScheme.background
                                             )
                                             .padding(DEFAULT_PADDING),
                                         verticalAlignment = Alignment.CenterVertically
@@ -146,7 +146,7 @@ fun main() {
                                         Text(
                                             text = "iTodo${if (screenName.isBlank()) "" else " - $screenName"}",
                                             style = MaterialTheme.typography.titleMedium,
-                                            color = if (dark) darkScheme.onBackground else lightScheme.onBackground
+                                            color = MaterialTheme.colorScheme.onBackground
                                         )
 
                                         // 窗口右上角操作按钮
@@ -205,7 +205,7 @@ fun main() {
                                     .padding(VERY_SMALL)
                                     .border(
                                         width = 1.dp,
-                                        color = if (dark) darkScheme.outline else lightScheme.outline,
+                                        color = if (dark) greenDarkScheme.outline else greenLightScheme.outline,
                                         shape = RoundedCornerShape(SMALL)
                                     )
                                     .shadow(
@@ -256,7 +256,7 @@ private fun WindowButton(
             modifier = Modifier.size(MIDDLE),
             painter = painter,
             contentDescription = description,
-            tint = if (isDark) darkScheme.onBackground else lightScheme.onBackground
+            tint = if (isDark) greenDarkScheme.onBackground else greenLightScheme.onBackground
         )
     }
 }

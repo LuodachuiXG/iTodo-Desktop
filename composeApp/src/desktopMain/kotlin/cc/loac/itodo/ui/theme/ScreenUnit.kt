@@ -7,3 +7,6 @@ val SCREEN_WIDE = 640.dp
 
 // 超宽屏
 val SCREEN_EXTRA_WIDE = 1280.dp
+
+// 巨宽屏
+val SCREEN_ULTRA_WIDE = 1600.dp

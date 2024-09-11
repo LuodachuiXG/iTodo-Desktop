@@ -10,6 +10,7 @@ enum class Screens(
     val screenName: String
 ) {
     LOGIN("login", "登录"),
-    ME("ME", "我"),
-    HOME("HOME", "首页")
+    ME("me", "我"),
+    HOME("home", "首页"),
+    THEME("theme", "主题")
 }
