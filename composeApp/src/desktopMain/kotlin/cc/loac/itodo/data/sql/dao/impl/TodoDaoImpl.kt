@@ -86,6 +86,7 @@ class TodoDaoImpl : TodoDao {
         isUpdate?.let { query.andWhere { Todos.uploaded eq isUpdate } }
         keyword?.let { query.andWhere { (Todos.title like "%$keyword%") or (Todos.todo like "%$keyword%") } }
         query.orderBy(Todos.createTime, SortOrder.DESC)
+        query.orderBy(Todos.top, SortOrder.DESC)
         query.map(::resultRowToTodo)
     }
 }

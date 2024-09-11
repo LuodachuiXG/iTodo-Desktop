@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollbarAdapter
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -17,10 +18,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cc.loac.itodo.data.models.Todo
+import cc.loac.itodo.ui.components.TodoCard
 import cc.loac.itodo.ui.theme.*
 import cc.loac.itodo.util.format
 import kotlinx.coroutines.launch
@@ -71,6 +74,7 @@ fun HomeScreen(
                 onClick = {
                     vm.insertTodo(
                         Todo(
+                            title = "Hello ",
                             todo = "你好这是你的第 ${todoList.value.size + 1} 条 Todo"
                         )
                     )
@@ -94,26 +98,15 @@ fun HomeScreen(
                         else -> 3
                     }
                 ),
-                modifier = Modifier.padding(top = SMALL),
+                modifier = Modifier
+                    .padding(top = SMALL)
+                    .clip(RoundedCornerShape(VERY_SMALL)),
                 verticalArrangement = Arrangement.spacedBy(SMALL),
                 state = lazyGridSate,
                 horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING, Alignment.Start)
             ) {
                 items(todoList.value.size) {
-                    val todo = todoList.value[it]
-                    Card {
-                        Column(modifier = Modifier.padding(DEFAULT_PADDING)) {
-                            Text(
-                                text = todo.todo,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            Text(
-                                text = todo.createTime.format(),
-                                style = MaterialTheme.typography.bodySmall
-                            )
-                        }
-                    }
+                    TodoCard(todoItem = todoList.value[it])
                 }
             }
             VerticalScrollbar(

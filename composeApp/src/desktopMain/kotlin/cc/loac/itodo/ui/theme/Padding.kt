@@ -17,3 +17,6 @@ val MIDDLE_IMAGE = 48.dp
 
 // 组件默认 Padding
 val DEFAULT_PADDING = MIDDLE_MIDDLE
+
+// 组件默认间距
+val DEFAULT_SPACING = SMALL
