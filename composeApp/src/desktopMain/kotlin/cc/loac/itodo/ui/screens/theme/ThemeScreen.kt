@@ -17,7 +17,7 @@ import androidx.navigation.NavHostController
 import cc.loac.itodo.ui.components.TitleBar
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 import cc.loac.itodo.ui.theme.DEFAULT_SPACING
-import cc.loac.itodo.ui.theme.ThemeFlow
+import cc.loac.itodo.ui.theme.Theme
 import cc.loac.itodo.util.painter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -52,7 +52,8 @@ fun ThemeScreen(
                 color = Color(0xFFB33B15)
             ) {
                 scope.launch {
-                    ThemeFlow.themeFlow.emit("red")
+                    Theme.themeFlow.emit(Color(0xFFB33B15))
+                    vm.setThemeSeedColor(Color(0xFFB33B15))
                 }
             }
 
@@ -60,7 +61,8 @@ fun ThemeScreen(
                 color = Color(0xFF63A002)
             ) {
                 scope.launch {
-                    ThemeFlow.themeFlow.emit("green")
+                    Theme.themeFlow.emit(Color(0xFF63A002))
+                    vm.setThemeSeedColor(Color(0xFF63A002))
                 }
             }
 
@@ -68,7 +70,8 @@ fun ThemeScreen(
                 color = Color(0xFF769CDF)
             ) {
                 scope.launch {
-                    ThemeFlow.themeFlow.emit("blue")
+                    Theme.themeFlow.emit(Color(0xFF769CDF))
+                    vm.setThemeSeedColor(Color(0xFF769CDF))
                 }
             }
 
@@ -76,7 +79,8 @@ fun ThemeScreen(
                 color = Color(0xFFFFDE3F)
             ) {
                 scope.launch {
-                    ThemeFlow.themeFlow.emit("yellow")
+                    Theme.themeFlow.emit(Color(0xFFFFDE3F))
+                    vm.setThemeSeedColor(Color(0xFFFFDE3F))
                 }
             }
         }

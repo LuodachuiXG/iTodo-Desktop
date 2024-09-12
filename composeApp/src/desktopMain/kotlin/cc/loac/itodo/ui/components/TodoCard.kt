@@ -29,11 +29,15 @@ import kotlinx.coroutines.launch
  * 代办事项卡片
  * @param todoItem 代办事项数据类
  * @param modifier 修饰符
+ * @param onDelete 删除事件
+ * @param onStatusChange 状态切换事件
  */
 @Composable
 fun TodoCard(
     todoItem: Todo,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDelete: () -> Unit = {},
+    onStatusChange: (TodoStatus) -> Unit = {}
 ) {
     val scope = rememberCoroutineScope()
 
@@ -109,11 +113,12 @@ fun TodoCard(
                             TodoStatus.PROGRESSING -> TodoStatus.COMPLETED
                             TodoStatus.COMPLETED -> TodoStatus.UNSTARTED
                         }
+                        onStatusChange(status)
                     }
 
                     // 代办事项删除按钮
                     DeleteButton {
-
+                        onDelete()
                     }
                 }
             }

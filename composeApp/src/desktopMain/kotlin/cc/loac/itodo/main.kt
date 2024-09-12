@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -20,12 +21,14 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import cc.loac.itodo.data.koin.koinConfiguration
-import cc.loac.itodo.data.models.enums.Key
+import cc.loac.itodo.data.models.enums.KeyValueEnum
 import cc.loac.itodo.data.sql.DatabaseSingleton
 import cc.loac.itodo.data.sql.dao.KeyValueDao
 import cc.loac.itodo.ui.ITodoApp
 import cc.loac.itodo.ui.theme.*
 import cc.loac.itodo.util.painter
+import com.materialkolor.hct.Hct
+import com.materialkolor.ktx.toColor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -67,23 +70,33 @@ fun main() {
                 mutableStateOf(false)
             }
 
+            // 主题种子颜色
+            var themeSeedColor by remember {
+                mutableStateOf<Color?>(null)
+            }
+
             LaunchedEffect(Unit) {
                 // 启动时获取一下之前的设置
                 ioScope.launch {
                     // 是否暗黑模式
-                    isDark = keyValueDao.getBoolean(Key.IS_DARK_MODE, false)!!
+                    isDark = keyValueDao.getBoolean(KeyValueEnum.IS_DARK_MODE, false)!!
 
                     // 窗口大小
-                    val size = keyValueDao.get(Key.WINDOW_SIZE, "400|500")!!
+                    val size = keyValueDao.get(KeyValueEnum.WINDOW_SIZE, "400|500")!!
                     val width = size.substringBefore("|").toIntOrNull() ?: 400
                     val height = size.substringAfter("|").toIntOrNull() ?: 500
                     windowState.size = DpSize(width.dp, height.dp)
 
                     // 窗口位置
-                    val position = keyValueDao.get(Key.WINDOW_POSITION, "40|40")!!
+                    val position = keyValueDao.get(KeyValueEnum.WINDOW_POSITION, "40|40")!!
                     val x = position.substringBefore("|").toIntOrNull() ?: 40
                     val y = position.substringAfter("|").toIntOrNull() ?: 40
                     windowState.position = WindowPosition(x.dp, y.dp)
+
+
+                    // 主题种子颜色
+                    val argb = keyValueDao.get(KeyValueEnum.THEME_COLOR_SEED, Color(0xFF63A002).value.toString())!!
+                    themeSeedColor = Color(argb.toULong())
                     isVisible = true
                 }
             }
@@ -96,8 +109,8 @@ fun main() {
                 ioScope.launch {
                     val size = "${windowState.size.width.value.toInt()}|${windowState.size.height.value.toInt()}"
                     val position = "${windowState.position.x.value.toInt()}|${windowState.position.y.value.toInt()}"
-                    keyValueDao.set(Key.WINDOW_SIZE, size)
-                    keyValueDao.set(Key.WINDOW_POSITION, position)
+                    keyValueDao.set(KeyValueEnum.WINDOW_SIZE, size)
+                    keyValueDao.set(KeyValueEnum.WINDOW_POSITION, position)
 
                     exitApplication()
                 }
@@ -112,9 +125,10 @@ fun main() {
                 state = windowState,
                 alwaysOnTop = alwaysOnTop
             ) {
-                isDark?.let { dark ->
+                if (isVisible) {
                     ITodoTheme(
-                        darkTheme = dark
+                        color = themeSeedColor,
+                        darkTheme = isDark!!
                     ) {
                         Column {
                             WindowDraggableArea {
@@ -158,30 +172,27 @@ fun main() {
                                             // 窗口是否总是在最前
                                             WindowButton(
                                                 painter = painter(if (alwaysOnTop) "keep.svg" else "keep_off.svg"),
-                                                description = "总在最前",
-                                                isDark = dark
+                                                description = "总在最前"
                                             ) {
                                                 alwaysOnTop = !alwaysOnTop
                                             }
 
                                             // 切换暗色模式
                                             WindowButton(
-                                                painter = painter(if (dark) "dark_mode.svg" else "light_mode.svg"),
-                                                description = "切换暗色模式",
-                                                isDark = dark
+                                                painter = painter(if (isDark!!) "dark_mode.svg" else "light_mode.svg"),
+                                                description = "切换暗色模式"
                                             ) {
-                                                isDark = !dark
+                                                isDark = !isDark!!
                                                 // 将最新的暗黑模式状态写入数据库
                                                 ioScope.launch {
-                                                    keyValueDao.set(Key.IS_DARK_MODE, isDark!!)
+                                                    keyValueDao.set(KeyValueEnum.IS_DARK_MODE, isDark!!)
                                                 }
                                             }
 
                                             // 最小化程序
                                             WindowButton(
                                                 painter = painter("minimize.svg"),
-                                                description = "最小化程序",
-                                                isDark = dark
+                                                description = "最小化程序"
                                             ) {
                                                 window.isMinimized = true
                                             }
@@ -189,8 +200,7 @@ fun main() {
                                             // 关闭程序
                                             WindowButton(
                                                 painter = painter("close.svg"),
-                                                description = "关闭程序",
-                                                isDark = dark
+                                                description = "关闭程序"
                                             ) {
                                                 exitApp()
                                             }
@@ -205,7 +215,7 @@ fun main() {
                                     .padding(VERY_SMALL)
                                     .border(
                                         width = 1.dp,
-                                        color = if (dark) greenDarkScheme.outline else greenLightScheme.outline,
+                                        color = MaterialTheme.colorScheme.outline,
                                         shape = RoundedCornerShape(SMALL)
                                     )
                                     .shadow(
@@ -234,7 +244,6 @@ fun main() {
  * @param modifier Modifier
  * @param painter 按钮图标
  * @param description 按钮描述
- * @param isDark 是否暗黑模式
  * @param onClick 点击事件
  */
 @Composable
@@ -242,7 +251,6 @@ private fun WindowButton(
     modifier: Modifier = Modifier,
     painter: Painter,
     description: String,
-    isDark: Boolean,
     onClick: () -> Unit
 ) {
     // 关闭程序
@@ -256,7 +264,7 @@ private fun WindowButton(
             modifier = Modifier.size(MIDDLE),
             painter = painter,
             contentDescription = description,
-            tint = if (isDark) greenDarkScheme.onBackground else greenLightScheme.onBackground
+            tint = MaterialTheme.colorScheme.onBackground
         )
     }
 }

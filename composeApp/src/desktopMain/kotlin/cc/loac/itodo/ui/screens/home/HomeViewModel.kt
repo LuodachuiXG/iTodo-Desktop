@@ -52,4 +52,26 @@ class HomeViewModel : ViewModel() {
             todoDao.addTodo(todo)
         }
     }
+
+    /**
+     * 更新一条待办事项
+     * @param todo 待办事项
+     * @param onComplete 更新完成回调
+     */
+    fun updateTodo(todo: Todo, onComplete: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            onComplete(todoDao.updateTodo(todo))
+        }
+    }
+
+    /**
+     * 删除一条待办事项
+     * @param ids 待办事项 ID 集合
+     * @param onComplete 删除完成回调
+     */
+    fun deleteTodo(ids: List<Long>, onComplete: (Boolean) -> Unit = {}) {
+        viewModelScope.launch {
+            onComplete(todoDao.deleteTodo(ids))
+        }
+    }
 }

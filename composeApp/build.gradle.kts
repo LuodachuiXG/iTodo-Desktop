@@ -22,12 +22,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
 
-            // Compose Navigation
-            implementation(libs.compose.navigation)
-
-            // SLF4J
-            implementation(libs.slf4j)
-
             // Exposed
             implementation(libs.exposed.core)
             implementation(libs.exposed.dao)
@@ -36,14 +30,22 @@ kotlin {
             // H2
             implementation(libs.sql.h2)
 
-            // Koin 注入
-            implementation(libs.koin.compose)
-            implementation(libs.koin.compose.viewmodel.navigation)
-
+            // 根据 Seed Color 生成 Material3 主题颜色
+            implementation(libs.material.kolor)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
+
+            // Compose Navigation
+            implementation(libs.compose.navigation)
+
+            // SLF4J
+            implementation(libs.slf4j)
+
+            // Koin 注入
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel.navigation)
         }
     }
 }

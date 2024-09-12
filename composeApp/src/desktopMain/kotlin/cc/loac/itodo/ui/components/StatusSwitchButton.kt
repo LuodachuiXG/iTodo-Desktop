@@ -70,14 +70,10 @@ fun StatusSwitchButton(
         Spacer(modifier = Modifier.width(2.dp))
         Icon(
             modifier = Modifier.size(24.dp),
-            painter = if (status == TodoStatus.UNSTARTED) {
-                painter("unstarted.svg")
-            } else if (status == TodoStatus.PROGRESSING) {
-                painter("progressing.svg")
-            } else if (status == TodoStatus.COMPLETED && showText) {
-                painter("thumb.svg")
-            } else {
-                painter("completed.svg")
+            painter = when (status) {
+                TodoStatus.UNSTARTED -> painter("unstarted.svg")
+                TodoStatus.PROGRESSING -> painter("progressing.svg")
+                else -> painter("completed.svg")
             },
             contentDescription = status.getDescription(),
             tint = MaterialTheme.colorScheme.onPrimary

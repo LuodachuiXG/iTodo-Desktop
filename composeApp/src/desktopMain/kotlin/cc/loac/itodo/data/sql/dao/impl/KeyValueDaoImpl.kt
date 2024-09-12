@@ -1,6 +1,6 @@
 package cc.loac.itodo.data.sql.dao.impl
 
-import cc.loac.itodo.data.models.enums.Key
+import cc.loac.itodo.data.models.enums.KeyValueEnum
 import cc.loac.itodo.data.sql.DatabaseSingleton.dbQuery
 import cc.loac.itodo.data.sql.dao.KeyValueDao
 import cc.loac.itodo.data.sql.tables.KeyValues
@@ -20,7 +20,7 @@ class KeyValueDaoImpl : KeyValueDao {
      * @param key 键
      * @param value 值
      */
-    override suspend fun set(key: Key, value: String): Boolean = dbQuery {
+    override suspend fun set(key: KeyValueEnum, value: String): Boolean = dbQuery {
         // 设置前先尝试删除键
         KeyValues.deleteWhere { KeyValues.key eq key.name }
 
@@ -36,7 +36,7 @@ class KeyValueDaoImpl : KeyValueDao {
      * @param key 键
      * @param value 值
      */
-    override suspend fun set(key: Key, value: Boolean): Boolean {
+    override suspend fun set(key: KeyValueEnum, value: Boolean): Boolean {
         return set(key, value.toString())
     }
 
@@ -45,7 +45,7 @@ class KeyValueDaoImpl : KeyValueDao {
      * @param key 键
      * @param value 值
      */
-    override suspend fun set(key: Key, value: Int): Boolean {
+    override suspend fun set(key: KeyValueEnum, value: Int): Boolean {
         return set(key, value.toString())
     }
 
@@ -55,7 +55,7 @@ class KeyValueDaoImpl : KeyValueDao {
      * @param defaultValue 默认值
      * @return 值
      */
-    override suspend fun get(key: Key, defaultValue: String?): String? = dbQuery {
+    override suspend fun get(key: KeyValueEnum, defaultValue: String?): String? = dbQuery {
         KeyValues
             .selectAll()
             .where { KeyValues.key eq key.name }
@@ -68,7 +68,7 @@ class KeyValueDaoImpl : KeyValueDao {
      * @param defaultValue 默认值
      * @return 值
      */
-    override suspend fun getBoolean(key: Key, defaultValue: Boolean?): Boolean? {
+    override suspend fun getBoolean(key: KeyValueEnum, defaultValue: Boolean?): Boolean? {
         val result = get(key) ?: return defaultValue
         if (!result.isBoolean()) return defaultValue
         return result.toBoolean()
@@ -80,7 +80,7 @@ class KeyValueDaoImpl : KeyValueDao {
      * @param defaultValue 默认值
      * @return 值
      */
-    override suspend fun getInt(key: Key, defaultValue: Int?): Int? {
+    override suspend fun getInt(key: KeyValueEnum, defaultValue: Int?): Int? {
         val result = get(key) ?: return defaultValue
         if (!result.isInt()) return defaultValue
         return result.toInt()

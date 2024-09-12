@@ -9,6 +9,7 @@ exposed_version = "0.54.0"
 h2_version = "2.3.232"
 koin_version = "4.0.0-RC2"
 slf4j_version = "2.0.16"
+material-kolor = "1.7.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -29,6 +30,7 @@ koin-compose-viewmodel-navigation = { group = "io.insert-koin", name = "koin-com
 
 slf4j = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j_version" }
 
+material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "material-kolor" }
 
 
 [plugins]

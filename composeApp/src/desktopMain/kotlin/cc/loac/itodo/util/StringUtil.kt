@@ -31,10 +31,10 @@ fun String.isUrl(): Boolean {
 
 /**
  * String 扩展函数
- * 验证是否是整数
+ * 验证是否是整数，包括正负整数
  */
 fun String.isInt(): Boolean {
-    return this.matches("^\\d+")
+    return this.toIntOrNull() != null
 }
 
 /**

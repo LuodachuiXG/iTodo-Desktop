@@ -105,7 +105,27 @@ fun HomeScreen(
                 horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING, Alignment.Start)
             ) {
                 items(todoList.value.size) {
-                    TodoCard(todoItem = todoList.value[it])
+                    val currentTodo = todoList.value[it]
+                    TodoCard(
+                        todoItem = currentTodo,
+                        onDelete = {
+                            // 删除事件
+                            vm.deleteTodo(listOf(currentTodo.id)) { result ->
+                                if (result) {
+                                    // 删除成功，刷新列表
+                                    vm.getTodoList()
+                                }
+                            }
+                        }
+                    ) { status ->
+                        // 状态改变事件
+                        vm.updateTodo(currentTodo.copy(status = status)) { result ->
+                            if (result) {
+                                // 更新成功，刷新列表
+                                vm.getTodoList()
+                            }
+                        }
+                    }
                 }
             }
             VerticalScrollbar(
