@@ -10,6 +10,7 @@ h2_version = "2.3.232"
 koin_version = "4.0.0-RC2"
 slf4j_version = "2.0.16"
 material-kolor = "1.7.0"
+ktor = "2.3.12"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -24,14 +25,12 @@ exposed-core = { group = "org.jetbrains.exposed", name = "exposed-core", version
 exposed-dao = { group = "org.jetbrains.exposed", name = "exposed-dao", version.ref = "exposed_version" }
 exposed-jdbc = { group = "org.jetbrains.exposed", name = "exposed-jdbc", version.ref = "exposed_version" }
 sql-h2 = { group = "com.h2database", name = "h2", version.ref = "h2_version" }
-
 koin-compose = { group = "io.insert-koin", name = "koin-compose", version.ref = "koin_version" }
 koin-compose-viewmodel-navigation = { group = "io.insert-koin", name = "koin-compose-viewmodel-navigation", version.ref = "koin_version" }
-
 slf4j = { group = "org.slf4j", name = "slf4j-nop", version.ref = "slf4j_version" }
-
 material-kolor = { group = "com.materialkolor", name = "material-kolor", version.ref = "material-kolor" }
-
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -102,7 +101,7 @@ fun HomeScreen(
                     .clip(RoundedCornerShape(VERY_SMALL)),
                 verticalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
                 state = lazyGridSate,
-                horizontalArrangement = Arrangement.spacedBy(DEFAULT_PADDING, Alignment.Start)
+                horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING, Alignment.Start)
             ) {
                 items(todoList.value.size) {
                     val currentTodo = todoList.value[it]

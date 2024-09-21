@@ -95,7 +95,7 @@ fun main() {
 
 
                     // 主题种子颜色
-                    val argb = keyValueDao.get(KeyValueEnum.THEME_COLOR_SEED, Color(0xFF63A002).value.toString())!!
+                    val argb = keyValueDao.get(KeyValueEnum.THEME_COLOR_SEED, themeColors["芽绿"]!!.value.toString())!!
                     themeSeedColor = Color(argb.toULong())
                     isVisible = true
                 }

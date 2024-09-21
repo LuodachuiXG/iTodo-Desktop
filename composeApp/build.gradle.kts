@@ -32,10 +32,6 @@ kotlin {
 
             // 根据 Seed Color 生成 Material3 主题颜色
             implementation(libs.material.kolor)
-        }
-        desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
-            implementation(libs.kotlinx.coroutines.swing)
 
             // Compose Navigation
             implementation(libs.compose.navigation)
@@ -46,6 +42,14 @@ kotlin {
             // Koin 注入
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel.navigation)
+            
+            // Ktor
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.okhttp)
+        }
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+            implementation(libs.kotlinx.coroutines.swing)
         }
     }
 }

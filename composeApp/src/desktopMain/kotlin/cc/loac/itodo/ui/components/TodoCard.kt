@@ -39,10 +39,12 @@ fun TodoCard(
     onDelete: () -> Unit = {},
     onStatusChange: (TodoStatus) -> Unit = {}
 ) {
-    val scope = rememberCoroutineScope()
-
     var status by remember {
         mutableStateOf(todoItem.status)
+    }
+
+    LaunchedEffect(todoItem) {
+        status = todoItem.status
     }
 
     val textColor = animateColorAsState(

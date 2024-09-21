@@ -23,6 +23,7 @@ import cc.loac.itodo.ui.screens.login.LoginScreen
 import cc.loac.itodo.ui.screens.me.MeScreen
 import cc.loac.itodo.ui.screens.theme.ThemeScreen
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
+import cc.loac.itodo.ui.theme.DEFAULT_SPACING
 import cc.loac.itodo.ui.theme.MIDDLE
 
 /**
@@ -50,6 +51,7 @@ private val bars = listOf(
  * iTodo 程序入口
  * @param onScreenChange 屏幕切换事件（回调当前页面名）
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ITodoApp(
     onScreenChange: (name: String) -> Unit = {}
@@ -75,6 +77,7 @@ fun ITodoApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackBarHostState)
@@ -92,18 +95,20 @@ fun ITodoApp(
                             alwaysShowLabel = false,
                             selected = currentRoute == it.route.route,
                             onClick = {
-                                onScreenChange(it.route.screenName)
-                                navController.navigate(it.route.route) {
-                                    // 清空栈内到 popUpTo ID 之间的所有 Item
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        // 保存页面状态
-                                        saveState = true
-                                        inclusive = true
+                                if (currentRoute != it.route.route) {
+                                    onScreenChange(it.route.screenName)
+                                    navController.navigate(it.route.route) {
+                                        // 清空栈内到 popUpTo ID 之间的所有 Item
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            // 保存页面状态
+                                            saveState = true
+                                            inclusive = true
+                                        }
+                                        // 避免多次点击产生多个实例
+                                        launchSingleTop = true
+                                        // 再次点击之前的 Item 时恢复状态
+                                        restoreState = true
                                     }
-                                    // 避免多次点击产生多个实例
-                                    launchSingleTop = true
-                                    // 再次点击之前的 Item 时恢复状态
-                                    restoreState = true
                                 }
                             },
                             icon = {
@@ -139,18 +144,20 @@ fun ITodoApp(
                             alwaysShowLabel = true,
                             selected = currentRoute == it.route.route,
                             onClick = {
-                                onScreenChange(it.route.screenName)
-                                navController.navigate(it.route.route) {
-                                    // 清空栈内到 popUpTo ID 之间的所有 Item
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        // 保存页面状态
-                                        saveState = true
-                                        inclusive = true
+                                if (currentRoute != it.route.route) {
+                                    onScreenChange(it.route.screenName)
+                                    navController.navigate(it.route.route) {
+                                        // 清空栈内到 popUpTo ID 之间的所有 Item
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            // 保存页面状态
+                                            saveState = true
+                                            inclusive = true
+                                        }
+                                        // 避免多次点击产生多个实例
+                                        launchSingleTop = true
+                                        // 再次点击之前的 Item 时恢复状态
+                                        restoreState = true
                                     }
-                                    // 避免多次点击产生多个实例
-                                    launchSingleTop = true
-                                    // 再次点击之前的 Item 时恢复状态
-                                    restoreState = true
                                 }
                             },
                             icon = {
@@ -167,6 +174,9 @@ fun ITodoApp(
                     }
                 }
             }
+
+
+            // 导航 Navigation
             NavHost(
                 navController = navController,
                 startDestination = Screens.LOGIN.route,
