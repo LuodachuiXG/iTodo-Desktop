@@ -1,6 +1,7 @@
 package cc.loac.itodo.ui.screens.theme
 
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,19 +11,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import cc.loac.itodo.data.models.enums.KeyValueEnum
+import cc.loac.itodo.data.sql.dao.KeyValueDao
 import cc.loac.itodo.ui.components.TitleBar
 import cc.loac.itodo.ui.theme.*
 import cc.loac.itodo.util.painter
+import com.materialkolor.ktx.lighten
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 /**
@@ -35,33 +39,107 @@ fun ThemeScreen(
     vm: ThemeViewModel = koinViewModel()
 ) {
     val scope = rememberCoroutineScope()
-    Column {
-        TitleBar(
-            title = "主题设置"
-        ) {
-            // 返回上一页
-            navController.popBackStack()
+
+    // 键值对表
+    val keyValueDao = koinInject<KeyValueDao>()
+
+    Box {
+        Column {
+            TitleBar(
+                title = "主题设置"
+            ) {
+                // 返回上一页
+                navController.popBackStack()
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(DEFAULT_PADDING),
+                horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
+                verticalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(themeColors.size) { index ->
+                    val color = themeColors.entries.elementAt(index)
+                    ColorButton(
+                        color = color.value,
+                        name = color.key
+                    ) {
+                        scope.launch {
+                            Theme.themeFlow.emit(color.value)
+                            vm.setThemeSeedColor(color.value)
+                        }
+                    }
+                }
+            }
         }
 
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(DEFAULT_PADDING),
-            horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
-            verticalArrangement = Arrangement.spacedBy(DEFAULT_SPACING),
-            modifier = Modifier.fillMaxSize()
+        // 是否显示主题名
+        var showThemeName by remember {
+            mutableStateOf(true)
+        }
+
+        // 主题名容器透明度动画
+        val alphaAnimate = animateFloatAsState(
+            targetValue = if (showThemeName) 1f else 0f
+        )
+
+        // 当前主题名（从数据库中取出）
+        var currentThemeName by remember {
+            mutableStateOf("芽绿")
+        }
+
+        // 当前主题颜色（从数据库中取出）
+        var currentThemeColor by remember {
+            mutableStateOf(Color(0xff96c24e))
+        }
+
+        LaunchedEffect(Unit) {
+            // 获取数据库中存储的主题色
+            val argb =
+                keyValueDao.get(KeyValueEnum.THEME_COLOR_SEED, themeColors["芽绿"]!!.value.toString())!!.toULong()
+            // 找到目标颜色
+            val theme = themeColors.filter { it.value.value == argb }
+            if (theme.isNotEmpty() && theme.size == 1) {
+                currentThemeName = theme.keys.first()
+                currentThemeColor = theme.values.first()
+            }
+
+            delay(800)
+            showThemeName = false
+        }
+
+        // 进入主题页前先显示一下该文字
+        AnimatedVisibility(
+            visible = alphaAnimate.value > 0f,
+            enter = fadeIn(),
+            exit = fadeOut()
         ) {
-            items(themeColors.size) { index ->
-                val color = themeColors.entries.elementAt(index)
-                ColorButton(
-                    color = color.value,
-                    name = color.key
-                ) {
-                    scope.launch {
-                        Theme.themeFlow.emit(color.value)
-                        vm.setThemeSeedColor(color.value)
-                    }
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .alpha(alphaAnimate.value),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = currentThemeName,
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier
+                        .background(
+                            currentThemeColor,
+                            shape = CardDefaults.shape
+                        )
+                        .shadow(
+                            elevation = 40.dp,
+                            shape = CardDefaults.shape,
+                            ambientColor = currentThemeColor,
+                            spotColor = currentThemeColor
+                        )
+                        .padding(DEFAULT_PADDING)
+                )
             }
         }
     }
