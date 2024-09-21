@@ -1,5 +1,6 @@
 package cc.loac.itodo.ui.screens.home
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.LocalScrollbarStyle
 import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.layout.*
@@ -17,6 +18,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import cc.loac.itodo.data.models.Todo
@@ -24,6 +26,7 @@ import cc.loac.itodo.data.models.enums.ScreenWidth
 import cc.loac.itodo.ui.components.AddTodoDialog
 import cc.loac.itodo.ui.components.TodoCard
 import cc.loac.itodo.ui.theme.*
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -41,10 +44,11 @@ fun HomeScreen(
     screenWidth: ScreenWidth,
     vm: HomeViewModel = koinViewModel()
 ) {
+
     val scope = rememberCoroutineScope()
 
     // 代办事项列表
-    val todoList = vm.todoList.collectAsState()
+    val todoList by vm.todoList.collectAsState()
 
     // 是否显示添加代办事项 Dialog
     var showAddTodoDialog by remember {
@@ -56,12 +60,20 @@ fun HomeScreen(
         vm.getTodoList()
     }
 
+    // 添加待办事项弹窗
     AddTodoDialog(
         visible = showAddTodoDialog,
+        snackBarHostState = snackBar,
         onDismiss = {
             showAddTodoDialog = false
         }
-    ) {}
+    ) {
+        showAddTodoDialog = false
+        vm.insertTodo(it)
+        scope.launch {
+            snackBar.showSnackbar("添加成功", duration = SnackbarDuration.Short)
+        }
+    }
 
 
     Column(
@@ -85,12 +97,12 @@ fun HomeScreen(
                 state = lazyGridSate,
                 horizontalArrangement = Arrangement.spacedBy(DEFAULT_SPACING, Alignment.Start)
             ) {
-                items(todoList.value.size) {
-                    val currentTodo = todoList.value[it]
+                items(todoList.size) {
+                    val currentTodo = todoList[it]
                     TodoCard(
                         // 最后一个卡片添加底部边距，不要和悬浮按钮重叠
                         modifier = Modifier.padding(
-                            bottom = if (it == todoList.value.lastIndex) 70.dp else 0.dp
+                            bottom = if (it == todoList.lastIndex) 70.dp else 0.dp
                         ),
                         todoItem = currentTodo,
                         onDelete = {
@@ -126,6 +138,7 @@ fun HomeScreen(
                 )
             )
 
+
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomEnd),
@@ -133,12 +146,6 @@ fun HomeScreen(
             ) {
                 ExtendedFloatingActionButton(
                     onClick = {
-//                        vm.insertTodo(
-//                            Todo(
-//                                title = "Hello ",
-//                                todo = "你好这是你的第 ${todoList.value.size + 1} 条 Todo"
-//                            )
-//                        )
                         showAddTodoDialog = true
                     },
                     icon = {
@@ -148,23 +155,9 @@ fun HomeScreen(
                         )
                     },
                     text = {
-                        Text("添加")
+                        Text("添加 Todo")
                     }
                 )
-
-                FloatingActionButton(
-                    onClick = {
-                        vm.getTodoList()
-                        scope.launch {
-                            snackBar.showSnackbar("刷新成功", duration = SnackbarDuration.Short)
-                        }
-                    }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = "刷新代办事项"
-                    )
-                }
             }
         }
     }

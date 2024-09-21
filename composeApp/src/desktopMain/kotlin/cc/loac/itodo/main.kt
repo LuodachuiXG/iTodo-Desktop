@@ -226,7 +226,6 @@ fun main() {
                                     )
                             ) {
                                 ITodoApp { name ->
-                                    println(name)
                                     screenName = name
                                 }
                             }

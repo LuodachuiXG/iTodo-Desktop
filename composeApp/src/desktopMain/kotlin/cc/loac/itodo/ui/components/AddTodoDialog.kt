@@ -1,10 +1,10 @@
 package cc.loac.itodo.ui.components
 
-import androidx.compose.animation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -12,34 +12,35 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.unit.dp
-import cc.loac.itodo.data.flows.AlertFlow
 import cc.loac.itodo.data.models.Todo
+import cc.loac.itodo.data.models.enums.TodoStatus
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
 import cc.loac.itodo.ui.theme.DEFAULT_SPACING
 import cc.loac.itodo.util.format
-import com.materialkolor.ktx.darken
-import java.util.*
+import kotlinx.coroutines.launch
 
 /**
  * 添加代办事项弹窗
- * @param modifier Modifier
  * @param visible 弹窗是否可见
+ * @param modifier Modifier
  * @param onDismiss 弹窗关闭回调
  * @param onAdd 添加代办事项回调
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTodoDialog(
-    modifier: Modifier = Modifier,
     visible: Boolean = false,
+    modifier: Modifier = Modifier,
+    snackBarHostState: SnackbarHostState,
     onDismiss: () -> Unit = {},
     onAdd: (todo: Todo) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     // 代办事项标题（可空）
     var title by remember {
         mutableStateOf("")
@@ -48,6 +49,11 @@ fun AddTodoDialog(
     // 代办事项内容
     var todoContent by remember {
         mutableStateOf("")
+    }
+
+    // 代办事项内容是否显示错误
+    var todoContentError by remember {
+        mutableStateOf(false)
     }
 
     // 是否显示截止日期选择框
@@ -63,11 +69,24 @@ fun AddTodoDialog(
         mutableStateOf(false)
     }
 
+    LaunchedEffect(visible) {
+        // 隐藏添加代办事项弹窗时清空数据
+        if (!visible) {
+            title = ""
+            todoContent = ""
+            todoContentError = false
+            showDeadlineDialog = false
+            datePickerState.selectedDateMillis = null
+            top = false
+        }
+    }
+
     BaseDialog(
         visible = visible,
         onDismiss = onDismiss,
         dismissOnBackPress = false,
-        dismissOnClickOutSide = false
+        dismissOnClickOutSide = false,
+        modifier = modifier
     ) {
         Column(
             modifier = Modifier.padding(DEFAULT_PADDING).verticalScroll(rememberScrollState())
@@ -100,7 +119,11 @@ fun AddTodoDialog(
                     onValueChange = { todoContent = it },
                     modifier = Modifier.fillMaxWidth(),
                     isRequired = true,
-                    singleLine = false
+                    singleLine = false,
+                    error = todoContentError,
+                    onErrorCancel = {
+                        todoContentError = false
+                    }
                 )
 
                 // 截止日期
@@ -198,9 +221,26 @@ fun AddTodoDialog(
 
                 TextButton(
                     onClick = {
-                        AlertFlow.alert {
-                            message = "你好啊"
+                        if (todoContent.isBlank()) {
+                            scope.launch {
+                                todoContentError = true
+                                snackBarHostState.showSnackbar(
+                                    "代办事项内容不能为空",
+                                    duration = SnackbarDuration.Short
+                                )
+                            }
+                            return@TextButton
                         }
+
+                        onAdd(
+                            Todo(
+                                title = title.ifBlank { null },
+                                todo = todoContent,
+                                status = TodoStatus.UNSTARTED,
+                                deadline = datePickerState.selectedDateMillis,
+                                top = top
+                            )
+                        )
                     }
                 ) {
                     Text("保存")
@@ -218,6 +258,8 @@ fun AddTodoDialog(
  * @param singleLine 是否单行
  * @param onValueChange 文本内容改变回调
  * @param isRequired 是否必填
+ * @param error 是否显示错误
+ * @param onErrorCancel 错误取消回调
  */
 @Composable
 private fun Input(
@@ -226,13 +268,20 @@ private fun Input(
     modifier: Modifier = Modifier,
     singleLine: Boolean = true,
     onValueChange: (String) -> Unit,
-    isRequired: Boolean = false
+    isRequired: Boolean = false,
+    error: Boolean = false,
+    onErrorCancel: () -> Unit = {}
 ) {
     OutlinedTextField(
-        modifier = modifier,
+        modifier = modifier.onFocusChanged {
+            if (it.isFocused) {
+                onErrorCancel()
+            }
+        },
         singleLine = singleLine,
         value = value,
         onValueChange = onValueChange,
+        isError = error,
         label = {
             Row {
                 Text(label)
