@@ -17,14 +17,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import cc.loac.itodo.data.flows.AlertFlow
+import cc.loac.itodo.data.models.AlertFlowModel
 import cc.loac.itodo.data.models.enums.ScreenWidth
+import cc.loac.itodo.ui.components.MyAlertDialog
 import cc.loac.itodo.ui.screens.home.HomeScreen
 import cc.loac.itodo.ui.screens.login.LoginScreen
 import cc.loac.itodo.ui.screens.me.MeScreen
 import cc.loac.itodo.ui.screens.theme.ThemeScreen
 import cc.loac.itodo.ui.theme.DEFAULT_PADDING
-import cc.loac.itodo.ui.theme.DEFAULT_SPACING
 import cc.loac.itodo.ui.theme.MIDDLE
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * 路由 Bar 密封类
@@ -51,7 +55,6 @@ private val bars = listOf(
  * iTodo 程序入口
  * @param onScreenChange 屏幕切换事件（回调当前页面名）
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ITodoApp(
     onScreenChange: (name: String) -> Unit = {}
@@ -77,6 +80,41 @@ fun ITodoApp(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    val scope = rememberCoroutineScope()
+
+
+    // 当前是否正在显示 Alert
+    var showAlert by remember {
+        mutableStateOf(false)
+    }
+
+    // 当前显示的 Alert 的配置信息
+    var alertFlowModel by remember {
+        mutableStateOf(AlertFlowModel())
+    }
+
+    MyAlertDialog(
+        visible = showAlert,
+        alertFlowModel = alertFlowModel,
+        onDismiss = {
+            showAlert = false
+            alertFlowModel = AlertFlowModel()
+        }
+    )
+
+    // 监听 Alert 消息流，用于显示弹窗
+    scope.launch {
+        AlertFlow.flow.collect {
+            // 如果当前有弹窗正在显示，循环等待
+            if (showAlert) {
+                alertFlowModel = AlertFlowModel()
+                showAlert = false
+            }
+
+            alertFlowModel = it
+            showAlert = true
+        }
+    }
 
     Scaffold(
         snackbarHost = {
