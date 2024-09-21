@@ -50,6 +50,9 @@ class HomeViewModel : ViewModel() {
     fun insertTodo(todo: Todo) {
         viewModelScope.launch {
             todoDao.addTodo(todo)
+
+            // 插入后刷新
+            getTodoList()
         }
     }
 
